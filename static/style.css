@@ -1,0 +1,146 @@
+/* =========================================
+   1. 공통 스타일 (Global)
+   ========================================= */
+body {
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+    background-color: #fafafa;
+    color: #262626;
+    margin: 0;
+}
+a { text-decoration: none; color: inherit; }
+.btn-primary { background-color: #0095f6; border: none; font-weight: 600; }
+.btn-primary:hover { background-color: #0074cc; }
+
+/* 프로필 동그라미 (공통) */
+.profile-circle {
+    width: 35px; height: 35px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    display: flex; justify-content: center; align-items: center;
+    color: white; font-weight: bold; font-size: 12px; margin-right: 10px;
+}
+.big-profile-circle {
+    width: 80px; height: 80px; font-size: 2rem; margin-right: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    display: flex; justify-content: center; align-items: center; color: white;
+}
+
+/* =========================================
+   2. 인증 페이지 (로그인/회원가입)
+   - body 태그에 class="auth-page" 추가 필요
+   ========================================= */
+body.auth-page {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    background-size: cover; background-position: center;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+}
+.auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px; border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    width: 100%; max-width: 400px; text-align: center;
+}
+.form-control-auth { background-color: #fafafa; padding: 12px; border: 1px solid #dbdbdb; }
+
+/* =========================================
+   3. 대시보드 & 리스트 (Instagram Card)
+   ========================================= */
+.insta-card {
+    background: white; border: 1px solid #dbdbdb; border-radius: 8px;
+    overflow: hidden; height: 100%;
+    display: flex; flex-direction: column; transition: transform 0.2s;
+}
+.insta-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+.card-header-insta {
+    background: white; padding: 10px; border-bottom: 1px solid #efefef;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.fake-image-area {
+    height: 180px; background-color: #f8f9fa;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    cursor: pointer; text-align: center; padding: 15px; border-bottom: 1px solid #efefef;
+    transition: background 0.2s;
+}
+.fake-image-area:hover { background-color: #f1f1f1; }
+.group-details {
+    display: none; padding: 15px; background-color: #fff;
+    font-size: 0.9rem; flex-grow: 1; border-top: 1px solid #efefef;
+}
+.search-container { max-width: 800px; margin: 0 auto 30px auto; }
+
+/* =========================================
+   4. 마이페이지 (MyPage)
+   ========================================= */
+.profile-header { background: white; border-bottom: 1px solid #dbdbdb; padding: 30px 20px; margin-bottom: 20px; }
+.white-box { background: white; border: 1px solid #dbdbdb; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+.section-title { font-size: 0.9rem; font-weight: bold; color: #8e8e8e; margin-bottom: 8px; margin-left: 5px; }
+.group-item { padding: 15px; border-bottom: 1px solid #efefef; display: flex; align-items: center; justify-content: space-between; }
+
+/* 스크롤 영역 (공부 기록) */
+.log-scroll-area { height: 600px; overflow-y: auto; background-color: #fff; }
+.log-item { padding: 15px; border-bottom: 1px dashed #efefef; position: relative; transition: 0.2s; }
+.log-item:hover { background-color: #f8f9fa; }
+.btn-delete { opacity: 0.3; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
+.log-item:hover .btn-delete { opacity: 1; color: red; }
+
+/* =========================================
+   5. 관리자 페이지 (Dark Theme)
+   - body 태그에 class="admin-page" 추가 필요
+   ========================================= */
+body.admin-page { background-color: #2c3e50; color: #ecf0f1; }
+.admin-card { background-color: #34495e; border: none; color: white; margin-bottom: 20px; border-radius: 10px; }
+.table-dark-custom { background-color: #34495e; color: #ecf0f1; }
+.table-dark-custom th, .table-dark-custom td { border-color: #465c71; }
+
+/* =========================================
+   6. 그룹 관리 페이지 (Manage Group)
+   ========================================= */
+.manage-container { max-width: 700px; margin-top: 30px; }
+.manage-card { border: 1px solid #dbdbdb; margin-bottom: 20px; background: white; border-radius: 8px; }
+.manage-card-header { background: white; font-weight: bold; border-bottom: 1px solid #efefef; padding: 15px; }
+.manage-list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #efefef; }
+.manage-list-item:last-child { border-bottom: none; }
+.danger-zone { border: 1px solid #ffcccc; background-color: #fff5f5; padding: 20px; border-radius: 8px; margin-top: 3rem; text-align: center; }
+
+/* =========================================
+   7. 게시글 상세 페이지 (Post Detail)
+   ========================================= */
+.detail-container {
+    max-width: 600px; margin: 20px auto;
+    background: white; border: 1px solid #dbdbdb; border-radius: 8px;
+    height: 80vh; /* 화면 높이의 80%만 차지 */
+    display: flex; flex-direction: column; /* 세로 배치 */
+    overflow: hidden; /* 둥근 모서리 튀어나옴 방지 */
+}
+.detail-header {
+    padding: 15px; border-bottom: 1px solid #efefef;
+    display: flex; align-items: center;
+    background-color: white;
+}
+.detail-scroll-area {
+    flex: 1; /* 남은 공간 모두 차지 */
+    overflow-y: auto; /* 내용 넘치면 스크롤 */
+    padding: 15px;
+}
+.comment-box {
+    border-top: 1px solid #efefef;
+    padding: 15px;
+    display: flex;
+    background-color: white;
+}
+
+/* =========================================
+   8. 회원가입 페이지 (Signup Page)
+   ========================================= */
+.signup-card {
+    background: rgba(255, 255, 255, 0.95); /* 흰색 배경 (약간 투명) */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 450px; /* 로그인보다 조금 넓게 */
+    margin: auto; /* 중앙 정렬 안전장치 */
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>대시보드</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom sticky-top mb-4">
+        <div class="container justify-content-center position-relative">
+            <span class="navbar-brand mb-0 h1" style="font-family: cursive;">Studygram</span>
+            
+            <div class="position-absolute end-0 me-3 d-flex align-items-center">
+                <a href="/mypage" class="text-decoration-none text-dark fw-bold me-3 d-none d-sm-block">
+                    <i class="bi bi-person-circle"></i> {{ name }}님
+                </a>
+                <a href="/create_group" class="btn btn-sm btn-primary me-2"><i class="bi bi-plus-lg"></i> 만들기</a>
+                <a href="/" class="text-dark"><i class="bi bi-box-arrow-right fs-4"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+
+        <div class="search-container">
+            <form action="/dashboard" method="GET">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="keyword" class="form-control border-start-0" placeholder="관심있는 스터디 검색..." value="{{ keyword }}">
+                    
+                    <select name="sort" class="form-select" style="max-width: 110px; border-left: 0;" onchange="this.form.submit()">
+                        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>최신순</option>
+                        <option value="name" {% if sort == 'name' %}selected{% endif %}>이름순</option>
+                    </select>
+
+                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filterOptions">
+                        <i class="bi bi-sliders"></i> 필터
+                    </button>
+                    <button type="submit" class="btn btn-primary">검색</button>
+                </div>
+                
+                <div class="collapse mt-2 {% if category or location %}show{% endif %}" id="filterOptions">
+                    <div class="card card-body bg-light border-0">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <select name="category" class="form-select form-select-sm">
+                                    <option value="">분야 전체</option>
+                                    {% for s in all_subjects %}
+                                        <option value="{{ s.subject }}" {% if category == s.subject %}selected{% endif %}>{{ s.subject }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <select name="location" class="form-select form-select-sm">
+                                    <option value="">지역 전체</option>
+                                    {% for r in regions %}
+                                        <option value="{{ r }}" {% if location == r %}selected{% endif %}>{{ r }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="alert alert-light border shadow-sm d-flex align-items-center mb-4 mx-auto" style="max-width: 800px;">
+            <span class="badge bg-dark me-2">MY</span>
+            <div class="flex-grow-1 text-truncate">
+                {% for status in my_status %}
+                    <span class="badge rounded-pill {% if status.status == 'approved' %}bg-primary{% else %}bg-secondary{% endif %} me-1">
+                        {{ status.gName }}
+                    </span>
+                {% else %}
+                    <span class="text-muted small">가입된 스터디가 없습니다.</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if groups %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for group in groups %}
+                <div class="col">
+                    <div class="insta-card h-100">
+                        <div class="card-header-insta">
+                            <div class="d-flex align-items-center">
+                                <div class="profile-circle">{{ group.subject[:1] }}</div>
+                                <div>
+                                    <div class="fw-bold text-truncate" style="max-width: 150px;">{{ group.gName }}</div>
+                                    <div style="font-size: 11px; color: gray;">
+                                        {{ group.location }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% if group.group_leader_id == session['user_id'] %}
+                                <span class="badge bg-danger" style="font-size: 0.6rem;">방장</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="fake-image-area" onclick="toggleDetails('details-{{ group.group_id }}')">
+                            <span class="badge bg-light text-dark border mb-2">{{ group.subject }}</span>
+                            <h5 class="fw-bold mb-0 text-dark">{{ group.gName }}</h5>
+                            <small class="text-primary mt-3" style="font-size: 0.8rem;">터치하여 상세보기</small>
+                        </div>
+
+                        <div id="details-{{ group.group_id }}" class="group-details border-top">
+                            <p class="mb-3" style="min-height: 40px;">
+                                {{ group.info or '상세 설명이 없습니다.' }}
+                            </p>
+                            
+                            <div class="d-grid gap-2 mt-auto">
+                                {% if group.group_leader_id == session['user_id'] %}
+                                    <a href="/manage_group/{{ group.group_id }}" class="btn btn-sm btn-danger">관리하기</a>
+                                    <a href="/group/{{ group.group_id }}" class="btn btn-sm btn-primary">입장</a>
+                                {% else %}
+                                    <a href="/join_group/{{ group.group_id }}" class="btn btn-sm btn-success">가입신청</a>
+                                    <a href="/group/{{ group.group_id }}" class="btn btn-sm btn-outline-secondary">구경하기</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-center mt-5">
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                            <a class="page-link" href="/dashboard?page={{ page-1 }}&keyword={{ keyword }}&category={{ category }}&location={{ location }}&sort={{ sort }}">이전</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">{{ page }} / {{ total_pages }}</span>
+                        </li>
+                        <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                            <a class="page-link" href="/dashboard?page={{ page+1 }}&keyword={{ keyword }}&category={{ category }}&location={{ location }}&sort={{ sort }}">다음</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-emoji-neutral fs-1 text-muted"></i>
+                <p class="mt-3 text-muted">조건에 맞는 스터디가 없습니다.</p>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleDetails(id) {
+            var allDetails = document.querySelectorAll('.group-details');
+            allDetails.forEach(function(el) {
+                if (el.id === id) {
+                    el.style.display = (el.style.display === "block") ? "none" : "block";
+                } else {
+                    el.style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

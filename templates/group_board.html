@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ group.gName }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom sticky-top">
+        <div class="container justify-content-center position-relative">
+            <span class="navbar-brand mb-0 h1">Studygram - {{ group.gName }}</span>
+            <a href="/dashboard" class="btn btn-sm btn-outline-dark position-absolute end-0 me-3">나가기</a>
+        </div>
+    </nav>
+
+    <div class="insta-card p-3 mt-3 mx-auto" style="max-width: 600px;">
+        <form action="/write_post/{{ group.group_id }}" method="POST" enctype="multipart/form-data">
+            <div class="d-flex align-items-center mb-2">
+                <div class="profile-circle me-2">Me</div>
+                <input type="text" name="content" class="form-control border-0 bg-light" placeholder="문구 입력..." required>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <input type="file" name="image" class="form-control form-control-sm w-50" accept="image/*">
+                <button type="submit" class="btn btn-primary btn-sm">게시</button>
+            </div>
+        </form>
+    </div>
+
+    {% for post in posts %}
+    <div class="insta-card mt-3 mx-auto" style="max-width: 600px;">
+        <div class="card-header-insta">
+            <div class="d-flex align-items-center">
+                <div class="profile-circle me-2"><i class="bi bi-person-fill"></i></div>
+                <span class="fw-bold">{{ post.author_name }}</span>
+            </div>
+            
+            {% if post.author_id == session['user_id'] %}
+                <a href="#" onclick="confirmDeletePost({{ post.post_id }})" class="text-danger">
+                    <i class="bi bi-trash3-fill"></i>
+                </a>
+            {% endif %}
+        </div>
+        
+        <div class="card-body p-0">
+            {% if post.image_path %}
+                <img src="/static/uploads/{{ post.image_path }}" style="width: 100%; height: auto; object-fit: cover;">
+            {% endif %}
+            <div class="p-3">
+                <p class="mb-1">{{ post.content }}</p>
+                <small class="text-muted" style="font-size: 0.8rem;">방금 전</small>
+            </div>
+        </div>
+
+        <div class="p-3 border-top">
+            <div class="mb-2">
+                <a href="/post/{{ post.post_id }}" class="text-dark text-decoration-none">
+                    <i class="bi bi-chat-bubble fs-4"></i>
+                </a>
+            </div>
+            <a href="/post/{{ post.post_id }}" class="text-muted text-decoration-none" style="font-size: 0.9rem;">
+                댓글 보기 및 달기...
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center mt-5 text-muted">
+        <p>게시물이 없습니다. 첫 글을 남겨보세요!</p>
+    </div>
+    {% endfor %}
+
+    <script>
+        function confirmDeletePost(postId) {
+            if (confirm("정말 이 게시글을 삭제하시겠습니까?\n삭제된 글은 복구할 수 없습니다.")) {
+                location.href = "/delete_post/" + postId;
+            }
+        }
+    </script>
+</body>
+</html>

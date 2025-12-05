@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>마이페이지</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom sticky-top">
+        <div class="container justify-content-center position-relative">
+            <span class="navbar-brand mb-0 h1">My Page</span>
+            <a href="/dashboard" class="position-absolute start-0 ms-3 text-dark"><i class="bi bi-arrow-left fs-4"></i></a>
+            <a href="/" class="position-absolute end-0 me-3 btn btn-sm btn-outline-dark">로그아웃</a>
+        </div>
+    </nav>
+
+    <div class="profile-header">
+        <div class="container d-flex align-items-center justify-content-center">
+            <div class="big-profile-circle"><i class="bi bi-person-fill"></i></div>
+            <div>
+                <h4 class="mb-0 fw-bold">{{ my_info.name }}</h4>
+                <p class="text-muted mb-1">{{ my_info.email }}</p>
+                <span class="badge bg-secondary">{{ my_info.location }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 1000px;">
+        <div class="row">
+            
+            <div class="col-md-5">
+                <div class="section-title">👑 내가 만든 스터디</div>
+                <div class="white-box">
+                    {% for group in leader_groups %}
+                    <div class="group-item">
+                        <div>
+                            <div class="fw-bold">{{ group.gName }}</div>
+                            <small class="text-muted">{{ group.subject }}</small>
+                        </div>
+                        <a href="/manage_group/{{ group.group_id }}" class="btn btn-sm btn-danger">관리</a>
+                    </div>
+                    {% else %}
+                    <div class="p-3 text-center text-muted small">없음</div>
+                    {% endfor %}
+                </div>
+
+                <div class="section-title">🌱 참여 중인 스터디</div>
+                <div class="white-box">
+                    {% for group in member_groups %}
+                    <div class="group-item">
+                        <div>
+                            <div class="fw-bold">
+                                {{ group.gName }}
+                                {% if group.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark" style="font-size: 0.7rem;">대기중</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">{{ group.subject }}</small>
+                        </div>
+                        <div class="d-flex gap-1">
+                            {% if group.status == 'approved' %}
+                                <a href="/group/{{ group.group_id }}" class="btn btn-sm btn-light border">입장</a>
+                            {% else %}
+                                <button class="btn btn-sm btn-light border text-muted" disabled>대기</button>
+                            {% endif %}
+                            
+                            <button onclick="confirmLeave('{{ group.gName }}', '{{ group.group_id }}')" class="btn btn-sm btn-light border text-danger">
+                                {% if group.status == 'pending' %}취소{% else %}탈퇴{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="p-3 text-center text-muted small">없음</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="section-title">🔥 Study Log (오늘의 공부)</div>
+                <div class="white-box">
+                    
+                    <div class="p-3 bg-light border-bottom">
+                        <form action="/add_log" method="POST" class="d-flex gap-2 align-items-center">
+                            <div style="width: 30%;">
+                                <select name="subject" class="form-select form-select-sm" required>
+                                    <option value="" disabled selected>과목</option>
+                                    {% for s in subjects %}
+                                        <option value="{{ s.subject }}">{{ s.subject }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div style="width: 20%;">
+                                <input type="number" name="minutes" class="form-control form-control-sm" placeholder="분" required>
+                            </div>
+                            <div class="d-flex flex-grow-1 gap-2">
+                                <input type="text" name="content" class="form-control form-control-sm" placeholder="내용" style="width: 100%;" required>
+                                <button type="submit" class="btn btn-sm btn-primary text-nowrap">저장</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="log-scroll-area">
+                        {% if study_logs %}
+                            {% for log in study_logs %}
+                            <div class="log-item">
+                                <div class="d-flex justify-content-between">
+                                    <span class="badge bg-primary bg-opacity-75">{{ log.subject }}</span>
+                                    <span class="log-date">{{ log.start_time }}</span>
+                                </div>
+                                <div class="mt-2 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="fw-bold text-dark">{{ log.content }}</span>
+                                        <span class="text-primary fw-bold ms-2">{{ log.minutes }}분</span>
+                                    </div>
+                                    <i class="bi bi-x-lg btn-delete" onclick="deleteLog({{ log.log_id }})" title="삭제"></i>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center p-5 text-muted">
+                                <i class="bi bi-pencil-square fs-1"></i>
+                                <p class="mt-3">기록이 없습니다.<br>오늘의 공부를 기록해보세요!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+
+        function confirmLeave(groupName, groupId) {
+            if (confirm("정말 '" + groupName + "' 스터디를 탈퇴(취소)하시겠습니까?")) {
+                location.href = "/leave_group/" + groupId;
+            }
+        }
+
+        function deleteLog(logId) {
+            if (confirm("이 기록을 삭제하시겠습니까?")) {
+                location.href = "/delete_log/" + logId;
+            }
+        }
+    </script>
+</body>
+</html>

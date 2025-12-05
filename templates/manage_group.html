@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>그룹 관리</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar navbar-light bg-white border-bottom sticky-top">
+        <div class="container-fluid justify-content-center position-relative">
+            <span class="navbar-brand mb-0 h1">그룹 관리 센터</span>
+            <a href="/mypage" class="position-absolute start-0 ms-3 text-dark"><i class="bi bi-arrow-left fs-4"></i></a>
+        </div>
+    </nav>
+
+    <div class="container manage-container pb-5">
+        <h3 class="fw-bold mb-4 text-center">{{ group.gName }}</h3>
+
+        <div class="manage-card shadow-sm">
+            <div class="manage-card-header text-primary">
+                <i class="bi bi-person-plus-fill"></i> 가입 승인 대기 ({{ pending_users|length }})
+            </div>
+            <div class="list-group list-group-flush">
+                {% for user in pending_users %}
+                <div class="manage-list-item">
+                    <div>
+                        <span class="fw-bold">{{ user.name }}</span>
+                        <small class="text-muted">({{ user.location }})</small>
+                        <br><small class="text-muted" style="font-size: 11px;">{{ user.email }}</small>
+                    </div>
+                    <a href="/approve_member/{{ group.group_id }}/{{ user.user_id }}" class="btn btn-sm btn-primary">승인</a>
+                </div>
+                {% else %}
+                <div class="manage-list-item text-muted justify-content-center py-4">대기 중인 신청자가 없습니다.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="manage-card shadow-sm mt-4">
+            <div class="manage-card-header text-success">
+                <i class="bi bi-people-fill"></i> 현재 멤버 관리
+            </div>
+            <div class="list-group list-group-flush">
+                {% for user in current_members %}
+                <div class="manage-list-item">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <span class="fw-bold">{{ user.name }}</span>
+                            <small class="text-muted"> | {{ user.location }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button onclick="confirmDelegate('{{ user.name }}', {{ user.user_id }})" class="btn btn-sm btn-warning fw-bold text-dark">
+                            <i class="bi bi-person-badge-fill"></i> 방장 위임
+                        </button>
+                        
+                        <button onclick="confirmKick('{{ user.name }}', {{ user.user_id }})" class="btn btn-sm btn-outline-danger">
+                            강퇴
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <div class="manage-list-item text-muted justify-content-center py-4">아직 다른 멤버가 없습니다.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="danger-zone">
+            <h5 class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Danger Zone</h5>
+            <p class="text-muted small mb-3">
+                스터디 그룹을 삭제하면 모든 게시글과 멤버 기록이 사라집니다.<br>
+                이 작업은 되돌릴 수 없습니다.
+            </p>
+            <button onclick="confirmDelete()" class="btn btn-danger fw-bold w-100">
+                스터디 그룹 삭제하기
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        function confirmKick(userName, userId) {
+            if (confirm(userName + " 님을 정말 강퇴하시겠습니까?")) {
+                location.href = "/kick_member/{{ group.group_id }}/" + userId;
+            }
+        }
+
+        function confirmDelegate(userName, userId) {
+            if (confirm(userName + " 님에게 방장 권한을 넘기시겠습니까?\n\n위임 후에는 일반 멤버로 변경됩니다.")) {
+                location.href = "/delegate_leader/{{ group.group_id }}/" + userId;
+            }
+        }
+        function confirmDelete() {
+            if (confirm("정말 이 스터디 그룹을 삭제하시겠습니까?")) {
+                if (confirm("삭제하면 복구할 수 없습니다. 진짜 삭제합니까?")) {
+                    location.href = "/delete_group/{{ group.group_id }}";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
